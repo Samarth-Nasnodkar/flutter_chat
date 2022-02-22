@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth;
+  String? _username;
 
   AuthService(this._firebaseAuth);
 
@@ -12,25 +14,36 @@ class AuthService {
     await _firebaseAuth.signOut();
   }
 
-  Future<bool> signIn({required String email, required String password}) async {
+  String? get userName => _username;
+
+  Future<String?> signIn(
+      {required String email, required String password}) async {
     try {
       await _firebaseAuth.signInWithEmailAndPassword(
           email: email, password: password);
-      return true;
+      var ref = FirebaseDatabase.instance.ref('/u');
+      ref.equalTo(email).once().then((v) {
+        _username = v.snapshot.value.toString();
+      });
+      return null;
     } on FirebaseAuthException catch (e) {
-      debugPrint('Sign in Error: ${e.message}');
-      return false;
+      // debugPrint('Sign in Error: ${e.message}');
+      return e.message;
     }
   }
 
-  Future<bool> signUp({required String email, required String password}) async {
+  Future<String?> signUp(
+      {required String email, required String password}) async {
     try {
       await _firebaseAuth.createUserWithEmailAndPassword(
           email: email, password: password);
-      return true;
+      // var ref = FirebaseDatabase.instance.ref('/u/$email');
+      // _username = email.replaceAll('@gmail.com', '');
+      // ref.set({'username': _username});
+      return null;
     } on FirebaseAuthException catch (e) {
-      debugPrint('Sign up Error: ${e.message}');
-      return false;
+      return e.message;
+      // return false;
     }
   }
 }

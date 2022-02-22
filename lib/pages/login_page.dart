@@ -12,6 +12,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color.fromARGB(255, 10, 11, 11),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -20,12 +21,14 @@ class LoginPage extends StatelessWidget {
             children: [
               TextField(
                 controller: emailController,
+                cursorColor: Colors.deepPurple,
                 decoration: const InputDecoration(
                   hintText: 'Email',
                 ),
               ),
               TextField(
                 controller: passwordController,
+                cursorColor: Colors.deepPurple,
                 obscureText: true,
                 decoration: const InputDecoration(
                   hintText: 'Password',
@@ -36,9 +39,27 @@ class LoginPage extends StatelessWidget {
                 child: Container(
                   child: TextButton(
                     onPressed: () {
-                      context.read<AuthService>().signIn(
-                          email: emailController.text,
-                          password: passwordController.text);
+                      context
+                          .read<AuthService>()
+                          .signIn(
+                              email: emailController.text,
+                              password: passwordController.text)
+                          .then((err) {
+                        if (err != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              backgroundColor: Colors.deepPurple,
+                              content: Text(
+                                err,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      });
                     },
                     child: const Text(
                       'Sign Up!',
@@ -48,7 +69,7 @@ class LoginPage extends StatelessWidget {
                     ),
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.blue,
+                    color: Colors.deepPurple,
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),

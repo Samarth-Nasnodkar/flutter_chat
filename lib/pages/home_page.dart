@@ -156,6 +156,7 @@ class _HomePageState extends State<HomePage> {
               Expanded(
                 child: ListView.builder(
                   itemCount: 20,
+                  physics: const BouncingScrollPhysics(),
                   itemBuilder: (ctx, index) {
                     var l = msgs[users[index]].length;
                     var lastmessage = (msgs[users[index]].isEmpty)
