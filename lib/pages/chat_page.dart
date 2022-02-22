@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 // import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/gestures.dart';
 // import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_chat/widgets/chat_message.dart';
@@ -188,8 +189,10 @@ class _ChatPageState extends State<ChatPage> {
                 physics: const BouncingScrollPhysics(),
                 // itemExtent: 40,
                 padding: const EdgeInsets.only(top: 10, bottom: 10),
+                dragStartBehavior: DragStartBehavior.down,
                 itemCount: messages.length,
                 itemBuilder: (context, index) {
+                  index = messages.length - 1 - index;
                   return Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -264,7 +267,7 @@ class _ChatPageState extends State<ChatPage> {
                   child: TextField(
                     onSubmitted: (value) {
                       _textController.clear();
-                      messages.insert(0, value);
+                      messages.add(value);
                       chats.push().set(value);
                       setState(() {});
                     },

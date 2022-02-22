@@ -1,9 +1,11 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/pages/chat_page.dart';
+import 'package:flutter_chat/utils/auth_service.dart';
 import 'package:flutter_chat/widgets/anim_title.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -14,16 +16,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final users = List.generate(20, (index) => 'Gutlo');
+  final _scaffKey = GlobalKey<ScaffoldState>();
   var msgs = {};
-  @override
-  void initState() {
-    super.initState();
+
+  loadChats() {
     final debUsers = ['Gutlo'];
     for (var user in debUsers) {
       var chats = FirebaseDatabase.instance.ref('chats/$user');
       msgs[user] = <String>[];
-      chats.once().then((value) {
-        value.snapshot.children.every((element) {
+      chats.get().then((value) {
+        value.children.every((element) {
           msgs[user].add(element.value.toString());
           setState(() {});
           return true;
@@ -40,10 +42,37 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    loadChats();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // loadChats();
     return Scaffold(
       // rgba(10,11,11,255)
+      key: _scaffKey,
       backgroundColor: const Color.fromARGB(255, 10, 11, 11),
+      endDrawer: Drawer(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              child: TextButton(
+                onPressed: () {
+                  context.read<AuthService>().signOut();
+                },
+                child: const Text('Sign Out'),
+              ),
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: Colors.black26,
+              ),
+            )
+          ],
+        ),
+      ),
       body: SafeArea(
         bottom: false,
         child: Padding(
@@ -79,10 +108,15 @@ class _HomePageState extends State<HomePage> {
                         width: 20,
                       ),
                       Badge(
-                        child: const CircleAvatar(
-                          radius: 20,
-                          foregroundImage: NetworkImage(
-                              'http://www.playtoearn.online/wp-content/uploads/2021/10/Bored-Ape-Yacht-Club-NFT-avatar.png'),
+                        child: InkWell(
+                          child: const CircleAvatar(
+                            radius: 20,
+                            foregroundImage: NetworkImage(
+                                'http://www.playtoearn.online/wp-content/uploads/2021/10/Bored-Ape-Yacht-Club-NFT-avatar.png'),
+                          ),
+                          onTap: () {
+                            _scaffKey.currentState?.openEndDrawer();
+                          },
                         ),
                         badgeColor: const Color.fromARGB(255, 89, 238, 94),
                         position: BadgePosition.bottomEnd(
@@ -123,9 +157,10 @@ class _HomePageState extends State<HomePage> {
                 child: ListView.builder(
                   itemCount: 20,
                   itemBuilder: (ctx, index) {
+                    var l = msgs[users[index]].length;
                     var lastmessage = (msgs[users[index]].isEmpty)
                         ? 'Loading...'
-                        : msgs[users[index]][0];
+                        : msgs[users[index]][l - 1];
                     return Padding(
                       padding: const EdgeInsets.only(top: 30),
                       child: ListTile(
@@ -163,11 +198,32 @@ class _HomePageState extends State<HomePage> {
                               color: Color.fromARGB(255, 10, 11, 11),
                               width: 3,
                             ),
-                            child: const CircleAvatar(
-                              radius: 25,
-                              backgroundColor: Colors.teal,
-                              foregroundImage: NetworkImage(
-                                  'https://pbs.twimg.com/media/FCQddC_WYAEzxfA?format=jpg&name=large'),
+                            child: GestureDetector(
+                              child: const CircleAvatar(
+                                radius: 25,
+                                backgroundColor: Colors.teal,
+                                foregroundImage: NetworkImage(
+                                  'https://pbs.twimg.com/media/FCQddC_WYAEzxfA?format=jpg&name=large',
+                                ),
+                              ),
+                              onLongPress: () {
+                                showModalBottomSheet(
+                                  context: context,
+                                  builder: (context) {
+                                    return Container(
+                                      height: 400,
+                                      decoration: const BoxDecoration(
+                                        image: DecorationImage(
+                                          fit: BoxFit.fitHeight,
+                                          image: NetworkImage(
+                                            'https://pbs.twimg.com/media/FCQddC_WYAEzxfA?format=jpg&name=large',
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                );
+                              },
                             ),
                           ),
                         ),

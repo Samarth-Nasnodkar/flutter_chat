@@ -4,7 +4,6 @@
 .dart_tool/
 .packages
 build/
-/android/app/google-services.json
 # If you're building an application, you may want to check-in your pubspec.lock
 pubspec.lock
 
@@ -20,3 +19,6 @@ doc/api/
 *.js_
 *.js.deps
 *.js.map
+
+key.properties
+google-services.json
