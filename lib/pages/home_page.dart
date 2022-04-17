@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chat/pages/chat_page.dart';
 import 'package:flutter_chat/utils/auth_service.dart';
+import 'package:flutter_chat/utils/message.dart';
 import 'package:flutter_chat/widgets/anim_title.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:badges/badges.dart';
@@ -15,18 +17,33 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final users = List.generate(20, (index) => 'Gutlo');
+  final users = ['Gutlo'];
   final _scaffKey = GlobalKey<ScaffoldState>();
-  var msgs = {};
+  Map<String, List<Message>> msgs = {};
+
+  String getMostRecentMsg(List<Message> msgs) {
+    for (var m in msgs.reversed) {
+      if (m is TextMessage) {
+        return m.content;
+      }
+    }
+    return "Start a chat";
+  }
 
   loadChats() {
-    final debUsers = ['Gutlo'];
-    for (var user in debUsers) {
+    // final debUsers = ['Gutlo'];
+    for (var user in users) {
       var chats = FirebaseDatabase.instance.ref('chats/$user');
-      msgs[user] = <String>[];
+      msgs[user] = <Message>[];
       chats.get().then((value) {
         value.children.every((element) {
-          msgs[user].add(element.value.toString());
+          final _d = element.value;
+          if ((_d is! Map)) return true;
+          if (_d["type"] == "s") {
+            msgs[user]?.add(TextMessage(content: _d["data"]));
+          } else if (_d["type"] == "f") {
+            msgs[user]?.add(FileMessage(fileURL: _d["data"]));
+          }
           setState(() {});
           return true;
         });
@@ -38,6 +55,7 @@ class _HomePageState extends State<HomePage> {
       // msgs[user] = messages;
       // setState(() {});
       debugPrint('Initialized Chats : $chats');
+      setState(() {});
     }
   }
 
@@ -109,10 +127,27 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Badge(
                         child: InkWell(
-                          child: const CircleAvatar(
-                            radius: 20,
-                            foregroundImage: NetworkImage(
-                                'http://www.playtoearn.online/wp-content/uploads/2021/10/Bored-Ape-Yacht-Club-NFT-avatar.png'),
+                          child: CachedNetworkImage(
+                            imageUrl:
+                                'http://www.playtoearn.online/wp-content/uploads/2021/10/Bored-Ape-Yacht-Club-NFT-avatar.png',
+                            progressIndicatorBuilder:
+                                (context, url, downloadProgress) =>
+                                    CircularProgressIndicator.adaptive(
+                              value: downloadProgress.progress,
+                              backgroundColor:
+                                  const Color.fromARGB(255, 95, 87, 235),
+                            ),
+                            imageBuilder: (context, imageProvider) => Container(
+                              width: 40.0,
+                              height: 40.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
                           ),
                           onTap: () {
                             _scaffKey.currentState?.openEndDrawer();
@@ -155,13 +190,13 @@ class _HomePageState extends State<HomePage> {
               ),
               Expanded(
                 child: ListView.builder(
-                  itemCount: 20,
+                  itemCount: users.length,
                   physics: const BouncingScrollPhysics(),
                   itemBuilder: (ctx, index) {
-                    var l = msgs[users[index]].length;
-                    var lastmessage = (msgs[users[index]].isEmpty)
+                    var l = msgs[users[index]]?.length;
+                    var lastmessage = (msgs[users[index]]?.isEmpty == true)
                         ? 'Loading...'
-                        : msgs[users[index]][l - 1];
+                        : getMostRecentMsg(msgs[users[index]]!);
                     return Padding(
                       padding: const EdgeInsets.only(top: 30),
                       child: ListTile(
@@ -199,12 +234,29 @@ class _HomePageState extends State<HomePage> {
                               color: Color.fromARGB(255, 10, 11, 11),
                               width: 3,
                             ),
+                            // url : 'https://pbs.twimg.com/media/FCQddC_WYAEzxfA?format=jpg&name=large'
                             child: GestureDetector(
-                              child: const CircleAvatar(
-                                radius: 25,
-                                backgroundColor: Colors.teal,
-                                foregroundImage: NetworkImage(
-                                  'https://pbs.twimg.com/media/FCQddC_WYAEzxfA?format=jpg&name=large',
+                              child: CachedNetworkImage(
+                                imageUrl:
+                                    'https://pbs.twimg.com/media/FCQddC_WYAEzxfA?format=jpg&name=large',
+                                progressIndicatorBuilder:
+                                    (context, url, downloadProgress) =>
+                                        CircularProgressIndicator.adaptive(
+                                  value: downloadProgress.progress,
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 95, 87, 235),
+                                ),
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                  width: 50.0,
+                                  height: 50.0,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    image: DecorationImage(
+                                      image: imageProvider,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
                                 ),
                               ),
                               onLongPress: () {
@@ -235,7 +287,7 @@ class _HomePageState extends State<HomePage> {
                               builder: (cotext) => ChatPage(
                                 index: index,
                                 name: users[index],
-                                messages: msgs[users[index]],
+                                messages: msgs[users[index]]!,
                               ),
                             ),
                           );

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_chat/utils/auth_service.dart';
+import 'package:flutter_chat/utils/gauth.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
@@ -73,6 +74,46 @@ class LoginPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5),
                   ),
                 ),
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    child: IconButton(
+                      splashRadius: 0.5,
+                      onPressed: () async {
+                        final prov =
+                            Provider.of<GAuthService>(context, listen: false);
+                        await prov.googleLogIn();
+                      },
+                      icon: const FaIcon(FontAwesomeIcons.google),
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.red,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 40.0,
+                  ),
+                  Container(
+                    child: IconButton(
+                      splashRadius: 0.5,
+                      onPressed: () {},
+                      icon: const FaIcon(
+                        FontAwesomeIcons.apple,
+                        size: 30,
+                      ),
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  )
+                ],
               )
             ],
           ),

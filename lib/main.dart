@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // import 'package:flutter_chat/pages/chat_page.dart';
 import 'package:flutter_chat/pages/home_page.dart';
 import 'package:flutter_chat/utils/auth_service.dart';
+import 'package:flutter_chat/utils/gauth.dart';
 import 'package:flutter_chat/widgets/auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,7 +28,10 @@ class App extends StatelessWidget {
         StreamProvider(
           create: (ctx) => ctx.read<AuthService>().authStateChanges,
           initialData: null,
-        )
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GAuthService(),
+        ),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
