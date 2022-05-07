@@ -359,7 +359,13 @@ class _ChatPageState extends State<ChatPage> {
                       // debugPrint("Uploading file...");
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Uploading Image...'),
+                          backgroundColor: Color.fromARGB(255, 10, 11, 11),
+                          content: Text(
+                            'Uploading Image...',
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          ),
                           duration: Duration(seconds: 30),
                         ),
                       );
@@ -375,7 +381,7 @@ class _ChatPageState extends State<ChatPage> {
                         "type": "f",
                         "data": downloadUrl,
                       });
-                      messages.add(FileMessage(fileURL: downloadUrl));
+                      // messages.add(FileMessage(fileURL: downloadUrl));
                       // debugPrint("Uploaded File!!!");
                       ScaffoldMessenger.of(context).hideCurrentSnackBar();
                       setState(() {});
@@ -403,7 +409,7 @@ class _ChatPageState extends State<ChatPage> {
                   child: TextField(
                     onSubmitted: (value) {
                       _textController.clear();
-                      messages.add(TextMessage(content: value));
+                      // messages.add(TextMessage(content: value));
                       chats.push().set({
                         "type": "s",
                         "data": value,

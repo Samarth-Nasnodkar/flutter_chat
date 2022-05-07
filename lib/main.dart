@@ -2,6 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter_chat/pages/chat_page.dart';
 import 'package:flutter_chat/pages/home_page.dart';
+import 'package:flutter_chat/pages/login_page.dart';
+import 'package:flutter_chat/pages/new_user_setup.dart';
+import 'package:flutter_chat/pages/signup_page.dart';
+import 'package:flutter_chat/pages/welcome_page.dart';
 import 'package:flutter_chat/utils/auth_service.dart';
 import 'package:flutter_chat/utils/gauth.dart';
 import 'package:flutter_chat/widgets/auth.dart';
@@ -45,7 +49,11 @@ class App extends StatelessWidget {
           fontFamily: GoogleFonts.poppins().fontFamily,
         ),
         routes: {
+          // "/": (context) => const AuthWrapper(),
           "/home": (context) => const HomePage(),
+          "/signup": (context) => SignUpPage(),
+          "/login": (context) => LoginPage(),
+          "/welcome": (context) => const WelcomePage()
           // "/chat": (context) => const ChatPage(index: 0),
         },
       ),

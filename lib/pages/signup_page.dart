@@ -1,15 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_chat/pages/new_user_setup.dart';
 import 'package:flutter_chat/utils/auth_service.dart';
 import 'package:flutter_chat/utils/gauth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 
-class LoginPage extends StatelessWidget {
+class SignUpPage extends StatelessWidget {
   final passwordController = TextEditingController();
   final emailController = TextEditingController();
 
-  LoginPage({Key? key}) : super(key: key);
+  SignUpPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -23,24 +24,21 @@ class LoginPage extends StatelessWidget {
             const SizedBox(
               height: 20,
             ),
-            const LogInText(),
+            const SignUpText(),
             const SizedBox(
               height: 50,
             ),
-            const Padding(
-              padding: EdgeInsets.only(left: 8.0),
-              child: Text(
-                "Log In with one of the following options.",
-                style: TextStyle(
-                  // rgba(110,111,111,255)
-                  color: Color.fromARGB(255, 110, 111, 111),
-                ),
+            const Text(
+              "Sign In with one of the following options.",
+              style: TextStyle(
+                // rgba(110,111,111,255)
+                color: Color.fromARGB(255, 110, 111, 111),
               ),
             ),
             const SizedBox(
               height: 20,
             ),
-            const LogInButtons(),
+            const SignUpButtons(),
             const SizedBox(
               height: 40,
             ),
@@ -52,8 +50,8 @@ class LoginPage extends StatelessWidget {
   }
 }
 
-class LogInText extends StatelessWidget {
-  const LogInText({
+class SignUpText extends StatelessWidget {
+  const SignUpText({
     Key? key,
   }) : super(key: key);
 
@@ -96,7 +94,7 @@ class LogInText extends StatelessWidget {
         const Padding(
           padding: EdgeInsets.all(8.0),
           child: Text(
-            "Log In",
+            "Sign Up",
             style: TextStyle(
               fontSize: 40,
               fontWeight: FontWeight.bold,
@@ -108,8 +106,8 @@ class LogInText extends StatelessWidget {
   }
 }
 
-class LogInButtons extends StatelessWidget {
-  const LogInButtons({Key? key}) : super(key: key);
+class SignUpButtons extends StatelessWidget {
+  const SignUpButtons({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -123,14 +121,14 @@ class LogInButtons extends StatelessWidget {
           child: GestureDetector(
             onTap: () async {
               final prov = Provider.of<GAuthService>(context, listen: false);
-              bool? f = await prov.googleLogIn();
+              bool? f = await prov.googleLogIn(newUser: true);
               if (f == false) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     backgroundColor: Colors.red,
                     elevation: 20,
                     content: Text(
-                      "This account doesn't exist. Please Sign Up instead",
+                      "This account already exists. Please Log In instead",
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -224,24 +222,23 @@ class TextFields extends StatelessWidget {
           child: TextField(
             controller: emailController,
             decoration: InputDecoration(
-              hintText: "Enter your Email",
-              focusedBorder: const OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20)),
-                borderSide: BorderSide(
-                  // rgba(120,53,106,255)
-                  color: Color.fromARGB(255, 120, 53, 106),
-                  width: 2,
+                hintText: "Enter your Email",
+                focusedBorder: const OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(
+                    // rgba(120,53,106,255)
+                    color: Color.fromARGB(255, 120, 53, 106),
+                    width: 2,
+                  ),
                 ),
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: const BorderRadius.all(Radius.circular(20)),
-                borderSide: BorderSide(
-                  // rgba(120,53,106,255)
-                  color: Colors.grey.withOpacity(0.5),
-                  width: 2,
-                ),
-              ),
-            ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  borderSide: BorderSide(
+                    // rgba(120,53,106,255)
+                    color: Colors.grey.withOpacity(0.5),
+                    width: 2,
+                  ),
+                )),
           ),
         ),
         const Padding(
@@ -290,7 +287,7 @@ class TextFields extends StatelessWidget {
           onTap: () {
             context
                 .read<AuthService>()
-                .signIn(
+                .signUp(
                     email: emailController.text,
                     password: passwordController.text)
                 .then((err) {
@@ -317,7 +314,7 @@ class TextFields extends StatelessWidget {
               height: 60,
               child: const Center(
                 child: Text(
-                  "Log in",
+                  "Sign up",
                   style: TextStyle(
                     fontSize: 16,
                   ),
@@ -326,18 +323,13 @@ class TextFields extends StatelessWidget {
               decoration: BoxDecoration(
                 // rgba(182,24,224,255)
                 // rgba(215,41,168,255)
-                // gradient: const LinearGradient(
-                //   colors: [
-                //     Color.fromARGB(255, 182, 24, 224),
-                //     Color.fromARGB(255, 215, 41, 168),
-                //   ],
-                // ),
-                color: const Color.fromARGB(255, 60, 60, 60),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Colors.blueAccent,
-                  width: 2,
+                gradient: const LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 182, 24, 224),
+                    Color.fromARGB(255, 215, 41, 168),
+                  ],
                 ),
+                borderRadius: BorderRadius.circular(20),
               ),
             ),
           ),
@@ -346,21 +338,21 @@ class TextFields extends StatelessWidget {
         Center(
           child: RichText(
             text: TextSpan(
-                text: "Don't have an account? ",
+                text: "Have an account? ",
                 style: const TextStyle(
                   color: Color.fromARGB(255, 110, 111, 111),
                 ),
                 children: [
                   TextSpan(
-                    text: " Sign Up",
+                    text: " Log In",
                     style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                     recognizer: TapGestureRecognizer()
                       ..onTap = () {
-                        debugPrint("Sign Up page clicked");
-                        Navigator.pushNamed(context, "/signup");
+                        debugPrint("Log In page clicked");
+                        Navigator.pushNamed(context, "/login");
                       },
                   ),
                 ]),
